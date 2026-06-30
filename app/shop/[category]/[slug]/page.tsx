@@ -20,6 +20,7 @@ import {
   parseProductImages,
   resolveAssetUrl,
   parseBulletPoints,
+  extractDescriptionBulletPoints,
   getActiveCoupons,
   isProductSellable,
 } from "../../../../lib/api";
@@ -111,7 +112,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const description = product.meta_desc || product.short_desc || product.description || getSiteDescription(settings);
   const canonicalPath = getProductPath(product);
-  const bulletPoints = parseBulletPoints(product.bullet_points);
+  const explicitBulletPoints = parseBulletPoints(product.bullet_points);
+  const fallbackDescriptionBullets =
+    explicitBulletPoints.length === 0 ? extractDescriptionBulletPoints(product.description) : [];
+  const bulletPoints = explicitBulletPoints.length > 0 ? explicitBulletPoints : fallbackDescriptionBullets;
+  const showDescriptionBody = Boolean(product.description) && bulletPoints.length === 0;
 
   // Product specs — only non-null fields
   const productSpecs = [
@@ -256,11 +261,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             )}
 
-            {/* Short Description */}
-            {product.short_desc ? (
-              <p className="pdp-short-desc">{product.short_desc}</p>
-            ) : null}
-
             {/* Delivery Strip */}
             {isSellable && (
               <div className="pdp-delivery-strip">
@@ -343,7 +343,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Bullet Points */}
             {bulletPoints.length > 0 && (
               <div className="pdp-bullets">
-                <h3 className="pdp-section-label">What's Included</h3>
+                <h3 className="pdp-section-label">About this product</h3>
                 <ul className="pdp-bullet-list">
                   {bulletPoints.map((point, index) => (
                     <li key={index} className="pdp-bullet-item">
@@ -357,8 +357,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             )}
 
+            {product.short_desc ? (
+              <p className="pdp-short-desc">{product.short_desc}</p>
+            ) : null}
+
             {/* Product Description */}
-            {product.description ? (
+            {showDescriptionBody ? (
               <div className="pdp-description">
                 <h3 className="pdp-section-label">About this product</h3>
                 <p className="pdp-desc-body">{product.description}</p>

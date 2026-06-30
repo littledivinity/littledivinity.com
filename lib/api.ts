@@ -412,12 +412,40 @@ export function parseBulletPoints(bullets?: Product["bullet_points"]): string[] 
     }
   }
 
+  const sanitizeBulletPoint = (item: string): string =>
+    item
+      .replace(/^[\s\-*•▪◦‣►✅☑️✔]+/u, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
   // Clean, limit characters to 150, and slice to max 10 bullet points
   return list
-    .map(item => item.trim())
-    .filter(item => item.length > 0)
-    .map(item => item.slice(0, 150))
+    .map((item) => sanitizeBulletPoint(item))
+    .filter((item) => item.length > 0)
+    .filter((item) => item.toLowerCase() !== "about this item")
+    .map((item) => item.slice(0, 150))
     .slice(0, 10);
+}
+
+export function extractDescriptionBulletPoints(description?: string | null): string[] {
+  const plainDescription = stripHtmlContent(description);
+
+  if (!plainDescription) {
+    return [];
+  }
+
+  const lines = plainDescription
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const bulletLikeLines = lines.filter((line) => /^[\s\-*•▪◦‣►✅☑️✔]/u.test(line));
+
+  if (bulletLikeLines.length === 0) {
+    return [];
+  }
+
+  return parseBulletPoints(lines.join("\n"));
 }
 
 export function getPrimaryImage(product: Product): string {
