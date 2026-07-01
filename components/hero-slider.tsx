@@ -101,7 +101,6 @@ export function HeroSlider({
                   alt={slide.alt}
                   fill
                   priority={index === 0}
-                  unoptimized={slide.image.startsWith("http")}
                   sizes="(max-width: 900px) 100vw, 70vw"
                 />
               </Link>
@@ -111,7 +110,6 @@ export function HeroSlider({
                 alt={slide.alt}
                 fill
                 priority={index === 0}
-                unoptimized={slide.image.startsWith("http")}
                 sizes="(max-width: 900px) 100vw, 70vw"
               />
             )}
