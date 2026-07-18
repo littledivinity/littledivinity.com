@@ -5,7 +5,7 @@ import { CustomerAddress, CustomerAuthConfig, CustomerUser } from "./types";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.API_BASE_URL ||
-  "https://ecombeckend.saaszo.in/api/v1";
+  "http://localhost:8000/api/v1";
 
 const CUSTOMER_TOKEN_KEY = "little-divinity-customer-token";
 
@@ -47,15 +47,21 @@ export function getStoredCustomerToken(): string | null {
     return null;
   }
 
-  return window.localStorage.getItem(CUSTOMER_TOKEN_KEY);
+  return (
+    window.sessionStorage.getItem(CUSTOMER_TOKEN_KEY) ||
+    window.localStorage.getItem(CUSTOMER_TOKEN_KEY)
+  );
 }
 
-export function storeCustomerToken(token: string): void {
+export function storeCustomerToken(token: string, persistent = false): void {
   if (typeof window === "undefined") {
     return;
   }
 
-  window.localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
+  window.sessionStorage.setItem(CUSTOMER_TOKEN_KEY, token);
+  if (persistent) {
+    window.localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
+  }
 }
 
 export function clearCustomerToken(): void {
@@ -63,6 +69,7 @@ export function clearCustomerToken(): void {
     return;
   }
 
+  window.sessionStorage.removeItem(CUSTOMER_TOKEN_KEY);
   window.localStorage.removeItem(CUSTOMER_TOKEN_KEY);
 }
 

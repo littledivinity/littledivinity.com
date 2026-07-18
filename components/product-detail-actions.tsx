@@ -4,14 +4,15 @@ import { useRouter } from "next/navigation";
 import { Product } from "../lib/types";
 import { formatPrice, isProductSellable } from "../lib/api";
 import { CartQuantityControl } from "./cart-quantity-control";
-import { useCart } from "./cart-provider";
+import { buildCartKey, useCart } from "./cart-provider";
 import { useWishlist } from "./wishlist-provider";
 
 export function ProductDetailActions({ product }: { product: Product }) {
   const router = useRouter();
   const { addItem, getItemQuantity } = useCart();
   const { toggleItem, hasItem } = useWishlist();
-  const quantity = getItemQuantity(product.slug);
+  const cartKey = buildCartKey(product.slug, null);
+  const quantity = getItemQuantity(cartKey);
   const isWishlisted = hasItem(product.slug);
   const isSellable = isProductSellable(product);
   const showAmazonButton = Boolean(product.amazon_button_enabled && product.amazon_link);
@@ -24,7 +25,7 @@ export function ProductDetailActions({ product }: { product: Product }) {
           {/* Primary CTA Row */}
           <div className="action-primary-row">
             {quantity > 0 ? (
-              <CartQuantityControl slug={product.slug} className="detail-quantity-wrap" />
+              <CartQuantityControl cartKey={cartKey} className="detail-quantity-wrap" />
             ) : (
               <button
                 type="button"

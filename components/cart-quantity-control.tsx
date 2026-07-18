@@ -3,18 +3,18 @@
 import { useCart } from "./cart-provider";
 
 type CartQuantityControlProps = {
-  slug: string;
+  cartKey: string;
   className?: string;
   compact?: boolean;
 };
 
 export function CartQuantityControl({
-  slug,
+  cartKey,
   className = "",
   compact = false,
 }: CartQuantityControlProps) {
   const { getItemQuantity, removeItem, updateQuantity } = useCart();
-  const quantity = getItemQuantity(slug);
+  const quantity = getItemQuantity(cartKey);
 
   if (quantity < 1) {
     return null;
@@ -28,11 +28,11 @@ export function CartQuantityControl({
         aria-label="Decrease quantity"
         onClick={() => {
           if (quantity <= 1) {
-            removeItem(slug);
+            removeItem(cartKey);
             return;
           }
 
-          updateQuantity(slug, quantity - 1);
+          updateQuantity(cartKey, quantity - 1);
         }}
       >
         −
@@ -42,12 +42,12 @@ export function CartQuantityControl({
         type="button"
         className="cart-quantity-button"
         aria-label="Increase quantity"
-        onClick={() => updateQuantity(slug, quantity + 1)}
+        onClick={() => updateQuantity(cartKey, quantity + 1)}
       >
         +
       </button>
       {compact ? null : (
-        <button type="button" className="cart-remove-chip" onClick={() => removeItem(slug)}>
+        <button type="button" className="cart-remove-chip" onClick={() => removeItem(cartKey)}>
           Remove
         </button>
       )}

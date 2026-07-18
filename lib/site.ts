@@ -9,7 +9,7 @@ const fallbackSiteDescription =
 const fallbackBackendSiteUrl =
   process.env.NEXT_PUBLIC_BACKEND_SITE_URL ||
   process.env.BACKEND_SITE_URL ||
-  "https://ecombeckend.saaszo.in";
+  "http://localhost:8000";
 
 function normalizeUrl(value?: string | null): string {
   const raw =

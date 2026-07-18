@@ -296,6 +296,23 @@ function CheckoutPageContent() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === "little-divinity-customer-token" && !event.newValue) {
+        setUser(null);
+        setSavedAddresses([]);
+        setSelectedAddressId(null);
+        setShipName("");
+        setShipEmail("");
+        setShipPhone("");
+        setShipAltPhone("");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   // Redirect to cart if empty
   useEffect(() => {
     if (!loadingConfig && items.length === 0 && !checkoutCompletingRef.current) {
@@ -622,7 +639,7 @@ function CheckoutPageContent() {
       notes: notes || undefined,
       items: items.map(item => ({
         product_id: item.id,
-        variant_id: null, // Default variant parameter as structured in CheckoutController
+        variant_id: item.variantId ?? null,
         quantity: item.quantity
       }))
     };

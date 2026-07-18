@@ -31,7 +31,7 @@ export function HeroSlider({
   showText = true,
 }: HeroSliderProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [viewportKey, setViewportKey] = useState("desktop");
+  const [viewportKey, setViewportKey] = useState<"mobile" | "tablet" | "desktop" | null>(null);
 
   useEffect(() => {
     const resolveViewportKey = () => {
@@ -84,6 +84,10 @@ export function HeroSlider({
   useEffect(() => {
     setActiveIndex(0);
   }, [viewportKey]);
+
+  if (viewportKey === null) {
+    return null;
+  }
 
   return (
     <div className="hero-slider" data-viewport={viewportKey}>

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { formatPrice, resolveAssetUrl } from "../lib/api";
 import { getProductPath } from "../lib/site";
 import { SiteSettings } from "../lib/types";
-import { useCart } from "./cart-provider";
+import { buildCartKey, useCart } from "./cart-provider";
 import { useWishlist } from "./wishlist-provider";
 
 export function WishlistView({ settings }: { settings: SiteSettings }) {
@@ -49,7 +49,8 @@ export function WishlistView({ settings }: { settings: SiteSettings }) {
 
         <div className="cart-list">
           {items.map((item, index) => {
-            const quantityInCart = getItemQuantity(item.slug);
+            const cartKey = buildCartKey(item.slug, null);
+            const quantityInCart = getItemQuantity(cartKey);
             const productPath = getProductPath({ slug: item.slug, category_slug: item.categorySlug ?? null });
 
             return (
@@ -134,6 +135,7 @@ export function WishlistView({ settings }: { settings: SiteSettings }) {
                           addItem({
                             id: item.id,
                             slug: item.slug,
+                            variantId: null,
                             name: item.name,
                             price: item.price,
                             images: [item.image],

@@ -50,7 +50,7 @@ export function CartView({ settings, offers }: { settings: SiteSettings; offers:
 
         <div className="cart-list">
           {items.map((item, index) => (
-            <article key={item.slug} className="cart-item-card">
+            <article key={item.cartKey} className="cart-item-card">
               <div className="cart-item-media">
                 <Link
                   href={getProductPath({ slug: item.slug, category_slug: item.categorySlug ?? null })}
@@ -85,7 +85,7 @@ export function CartView({ settings, offers }: { settings: SiteSettings; offers:
                       type="button"
                       className="cart-item-delete-btn"
                       aria-label="Remove item"
-                      onClick={() => removeItem(item.slug)}
+                      onClick={() => removeItem(item.cartKey)}
                     >
                       <svg
                         viewBox="0 0 24 24"
@@ -105,7 +105,7 @@ export function CartView({ settings, offers }: { settings: SiteSettings; offers:
                 <div className="cart-item-foot">
                   <div className="quantity-wrapper">
                     <span className="quantity-label">Quantity</span>
-                    <CartQuantityControl slug={item.slug} compact />
+                    <CartQuantityControl cartKey={item.cartKey} compact />
                   </div>
                   <Link
                     href={getProductPath({ slug: item.slug, category_slug: item.categorySlug ?? null })}

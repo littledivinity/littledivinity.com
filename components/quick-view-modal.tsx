@@ -75,21 +75,25 @@ export function QuickViewModal({ product, isOpen, onClose, currencySymbol }: Qui
   // Reset active image index and fetch related products when product changes
   useEffect(() => {
     setActiveImageIndex(0);
-    
+
     if (!isOpen || !product.category_slug) return;
-    
-    let active = true;
+
+    const controller = new AbortController();
     getProducts(`category=${encodeURIComponent(product.category_slug)}&per_page=5`)
       .then((res) => {
-        if (active && res?.items) {
+        if (!controller.signal.aborted && res?.items) {
           const filtered = res.items.filter((item) => item.id !== product.id).slice(0, 4);
           setRelatedAccents(filtered);
         }
       })
-      .catch((err) => console.error("Error fetching related accents", err));
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          console.error("Error fetching related accents", err);
+        }
+      });
 
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [product, isOpen]);
 

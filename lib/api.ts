@@ -6,7 +6,7 @@ import { Category, Coupon, HomepageSection, NavigationItem, Product, ProductList
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.API_BASE_URL ||
-  "https://ecombeckend.saaszo.in/api/v1";
+  "http://localhost:8000/api/v1";
 
 const BACKEND_SITE_URL =
   process.env.NEXT_PUBLIC_BACKEND_SITE_URL ||
@@ -258,6 +258,10 @@ function isNextDynamicUsageSignal(error: unknown): boolean {
   );
 }
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
 type ReadFetchOptions = {
   noStore?: boolean;
   revalidate?: number;
@@ -458,15 +462,15 @@ export function isProductSellable(product: Product): boolean {
 }
 
 export function formatPrice(value: number | string | null | undefined, symbol = "Rs."): string {
-  const amount = Number(value || 0);
+  const amount = Number(value ?? 0);
   return `${symbol}${amount.toLocaleString("en-IN")}`;
 }
 
 export function discountPercent(product: Product): number | null {
-  const price = Number(product.price || 0);
-  const salePrice = Number(product.sale_price || 0);
+  const price = Number(product.price ?? 0);
+  const salePrice = Number(product.sale_price ?? 0);
 
-  if (!price || !salePrice || salePrice >= price) {
+  if (price <= 0 || salePrice <= 0 || salePrice >= price) {
     return null;
   }
 
@@ -714,10 +718,10 @@ export async function placeOrder(data: PlaceOrderInput, token?: string): Promise
 
     const result = await response.json();
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Something went wrong while placing order."
+      message: getErrorMessage(error, "Something went wrong while placing order.")
     };
   }
 }
@@ -752,10 +756,10 @@ export async function verifyPayment(
     });
 
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Failed to verify payment."
+      message: getErrorMessage(error, "Failed to verify payment.")
     };
   }
 }
@@ -778,10 +782,10 @@ export async function cancelOrder(orderNumber: string, token?: string, accessTok
     });
 
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Failed to cancel order."
+      message: getErrorMessage(error, "Failed to cancel order.")
     };
   }
 }
@@ -830,10 +834,10 @@ export async function trackOrder(orderNumber: string, contact: string): Promise<
 
     const result = await response.json();
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Something went wrong while fetching tracking information."
+      message: getErrorMessage(error, "Something went wrong while fetching tracking information.")
     };
   }
 }
@@ -870,10 +874,10 @@ export async function getCustomerOrders(token: string): Promise<{
 
     const result = await response.json();
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve order history."
+      message: getErrorMessage(error, "Could not retrieve order history.")
     };
   }
 }
@@ -949,10 +953,10 @@ export async function getCustomerOrderDetail(token: string, orderNumber: string)
 
     const result = await response.json();
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve order details."
+      message: getErrorMessage(error, "Could not retrieve order details.")
     };
   }
 }
@@ -991,10 +995,10 @@ export async function requestCustomerOrderReturn(
     });
 
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not submit the return request."
+      message: getErrorMessage(error, "Could not submit the return request.")
     };
   }
 }
@@ -1035,12 +1039,13 @@ export async function getBlogPosts(params: {
 
     const response = await fetch(url.toString(), {
       cache: "no-store", // Keep it fresh, or revalidate in background
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog posts.",
+      message: getErrorMessage(error, "Could not retrieve blog posts."),
       data: {
         current_page: 1,
         data: [],
@@ -1067,12 +1072,13 @@ export async function getBlogPost(slug: string): Promise<{
   try {
     const response = await fetch(`${API_BASE_URL}/blog/posts/${slug}`, {
       cache: "no-store",
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog post details.",
+      message: getErrorMessage(error, "Could not retrieve blog post details."),
       data: null,
     };
   }
@@ -1086,12 +1092,13 @@ export async function getBlogCategories(): Promise<{
   try {
     const response = await fetch(`${API_BASE_URL}/blog/categories`, {
       cache: "no-store",
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog categories.",
+      message: getErrorMessage(error, "Could not retrieve blog categories."),
       data: [],
     };
   }
@@ -1105,12 +1112,13 @@ export async function getBlogTags(): Promise<{
   try {
     const response = await fetch(`${API_BASE_URL}/blog/tags`, {
       cache: "no-store",
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog tags.",
+      message: getErrorMessage(error, "Could not retrieve blog tags."),
       data: [],
     };
   }
@@ -1124,12 +1132,13 @@ export async function getBlogTag(slug: string): Promise<{
   try {
     const response = await fetch(`${API_BASE_URL}/blog/tags/${slug}`, {
       cache: "no-store",
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog tag details.",
+      message: getErrorMessage(error, "Could not retrieve blog tag details."),
       data: null,
     };
   }
@@ -1143,12 +1152,13 @@ export async function getBlogAuthors(): Promise<{
   try {
     const response = await fetch(`${API_BASE_URL}/blog/authors`, {
       cache: "no-store",
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog authors.",
+      message: getErrorMessage(error, "Could not retrieve blog authors."),
       data: [],
     };
   }
@@ -1162,12 +1172,13 @@ export async function getBlogCategory(slug: string): Promise<{
   try {
     const response = await fetch(`${API_BASE_URL}/blog/categories/${slug}`, {
       cache: "no-store",
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog category details.",
+      message: getErrorMessage(error, "Could not retrieve blog category details."),
       data: null,
     };
   }
@@ -1181,12 +1192,13 @@ export async function getBlogAuthor(slug: string): Promise<{
   try {
     const response = await fetch(`${API_BASE_URL}/blog/authors/${slug}`, {
       cache: "no-store",
+      headers: { Accept: "application/json" },
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Could not retrieve blog author details.",
+      message: getErrorMessage(error, "Could not retrieve blog author details."),
       data: null,
     };
   }
@@ -1206,10 +1218,10 @@ export async function subscribeNewsletter(email: string): Promise<{
       body: JSON.stringify({ email }),
     });
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error?.message || "Something went wrong. Please try again later.",
+      message: getErrorMessage(error, "Something went wrong. Please try again later."),
     };
   }
 }

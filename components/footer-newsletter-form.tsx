@@ -13,7 +13,7 @@ export function FooterNewsletterForm({ email: fallbackEmail }: { email: string }
     event.preventDefault();
 
     const trimmed = value.trim();
-    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+    const valid = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(trimmed);
 
     if (!valid) {
       setStatus("error");

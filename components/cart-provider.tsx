@@ -10,11 +10,15 @@ const CART_STORAGE_KEY = "little-divinity-cart";
 export type CartProductInput = Pick<
   Product,
   "id" | "slug" | "name" | "price" | "sale_price" | "effective_price" | "images" | "category_name" | "category_slug" | "is_sellable"
->;
+> & {
+  variantId?: number | null;
+};
 
 export type CartItem = {
   id: number;
   slug: string;
+  variantId?: number | null;
+  cartKey: string;
   name: string;
   price: number;
   image: string;
@@ -28,9 +32,9 @@ type CartContextValue = {
   count: number;
   subtotal: number;
   addItem: (product: CartProductInput, quantity?: number) => void;
-  getItemQuantity: (slug: string) => number;
-  removeItem: (slug: string) => void;
-  updateQuantity: (slug: string, quantity: number) => void;
+  getItemQuantity: (cartKey: string) => number;
+  removeItem: (cartKey: string) => void;
+  updateQuantity: (cartKey: string, quantity: number) => void;
   clearCart: () => void;
   isAddedModalOpen: boolean;
   lastAddedItem: CartItem | null;
@@ -38,6 +42,10 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
+
+export function buildCartKey(slug: string, variantId?: number | null): string {
+  return `${slug}__${variantId ?? "default"}`;
+}
 
 function readCart(): CartItem[] {
   if (typeof window === "undefined") {
@@ -52,7 +60,15 @@ function readCart(): CartItem[] {
     }
 
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.map((item) => ({
+      ...item,
+      variantId: item.variantId ?? null,
+      cartKey: item.cartKey || buildCartKey(item.slug, item.variantId ?? null),
+    }));
   } catch {
     return [];
   }
@@ -102,7 +118,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
 
         const nextItems = [...readCart()];
-        const index = nextItems.findIndex((item) => item.slug === product.slug);
+        const cartKey = buildCartKey(product.slug, product.variantId ?? null);
+        const index = nextItems.findIndex((item) => item.cartKey === cartKey);
         const safeQuantity = Math.max(1, quantity);
         let addedItem: CartItem;
 
@@ -116,6 +133,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           const newItem = {
             id: product.id,
             slug: product.slug,
+            variantId: product.variantId ?? null,
+            cartKey,
             name: product.name,
             price: Number(product.effective_price ?? product.sale_price ?? product.price ?? 0),
             image: getPrimaryImage(product),
@@ -132,17 +151,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setLastAddedItem(addedItem);
         setAddedModalOpen(true);
       },
-      getItemQuantity(slug) {
-        return items.find((item) => item.slug === slug)?.quantity ?? 0;
+      getItemQuantity(cartKey) {
+        return items.find((item) => item.cartKey === cartKey)?.quantity ?? 0;
       },
-      removeItem(slug) {
-        const nextItems = readCart().filter((item) => item.slug !== slug);
+      removeItem(cartKey) {
+        const nextItems = readCart().filter((item) => item.cartKey !== cartKey);
         writeCart(nextItems);
         setItems(nextItems);
       },
-      updateQuantity(slug, quantity) {
+      updateQuantity(cartKey, quantity) {
         const nextItems = readCart().map((item) =>
-          item.slug === slug ? { ...item, quantity: Math.max(1, quantity) } : item
+          item.cartKey === cartKey ? { ...item, quantity: Math.max(1, quantity) } : item
         );
         writeCart(nextItems);
         setItems(nextItems);

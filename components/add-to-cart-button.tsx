@@ -2,7 +2,7 @@
 
 import { Product } from "../lib/types";
 import { isProductSellable } from "../lib/api";
-import { useCart } from "./cart-provider";
+import { buildCartKey, useCart } from "./cart-provider";
 import { CartQuantityControl } from "./cart-quantity-control";
 
 type AddToCartButtonProps = {
@@ -14,7 +14,8 @@ type AddToCartButtonProps = {
 export function AddToCartButton({ product, className = "product-card-action", label = "Add To Cart" }: AddToCartButtonProps) {
   const { addItem, getItemQuantity } = useCart();
   const isSellable = isProductSellable(product);
-  const quantity = getItemQuantity(product.slug);
+  const cartKey = buildCartKey(product.slug, null);
+  const quantity = getItemQuantity(cartKey);
 
   if (!isSellable) {
     return (
@@ -25,7 +26,7 @@ export function AddToCartButton({ product, className = "product-card-action", la
   }
 
   if (quantity > 0) {
-    return <CartQuantityControl slug={product.slug} className="product-card-quantity-wrap" compact />;
+    return <CartQuantityControl cartKey={cartKey} className="product-card-quantity-wrap" compact />;
   }
 
   return (
