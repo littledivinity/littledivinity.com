@@ -189,9 +189,9 @@ img {
 
 .header-shell {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr) 170px;
+  grid-template-columns: 150px minmax(0, 1fr) 152px;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   height: 80px;
 }
 
@@ -253,8 +253,8 @@ h3,
 .header-tools {
   display: flex;
   align-items: center;
-  gap: 1.8rem;
-  font-size: 0.96rem;
+  gap: 1.15rem;
+  font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -731,7 +731,7 @@ h3,
   align-items: center;
   white-space: nowrap;
   color: #191919;
-  padding: 0.45rem 0.2rem;
+  padding: 0.42rem 0.12rem;
   border-radius: 999px;
   transition: color 240ms ease, background 240ms ease, transform 240ms ease;
 }

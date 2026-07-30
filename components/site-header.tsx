@@ -58,7 +58,12 @@ function ensureUtilityMenuItems(items: NavigationItem[]): NavigationItem[] {
   const normalizedItems = items.map((item) => ({
     ...item,
     title: normalizeMenuTitle(item.title, typeof item.url === "string" ? item.url : ""),
-  }));
+  })).filter((item) => {
+    const href = typeof item.url === "string" ? item.url.trim() : "";
+    const title = item.title.trim().toLowerCase();
+
+    return !(title === "home" && (href === "/" || href === "" || href === "https://www.littledivinity.com/"));
+  });
 
   const hasWarrantyEntry = normalizedItems.some((item) =>
     typeof item.url === "string" && item.url.startsWith("/warranty-portal")
