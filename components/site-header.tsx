@@ -40,6 +40,43 @@ type NavDisplayItem = {
 };
 
 const MOBILE_LAYOUT_BREAKPOINT = 991;
+const REGISTER_WARRANTY_HREF = "/warranty-portal?tab=register";
+
+function normalizeMenuTitle(title: string, href: string): string {
+  if (href.startsWith("/live-auctions")) {
+    return "Live Auctions";
+  }
+
+  if (href.startsWith("/warranty-portal")) {
+    return "Register Warranty";
+  }
+
+  return title;
+}
+
+function ensureUtilityMenuItems(items: NavigationItem[]): NavigationItem[] {
+  const normalizedItems = items.map((item) => ({
+    ...item,
+    title: normalizeMenuTitle(item.title, typeof item.url === "string" ? item.url : ""),
+  }));
+
+  const hasWarrantyEntry = normalizedItems.some((item) =>
+    typeof item.url === "string" && item.url.startsWith("/warranty-portal")
+  );
+
+  if (hasWarrantyEntry) {
+    return normalizedItems;
+  }
+
+  return [
+    ...normalizedItems,
+    {
+      id: 900001,
+      title: "Register Warranty",
+      url: REGISTER_WARRANTY_HREF,
+    },
+  ];
+}
 
 export function SiteHeader({ brandName, logoUrl, categories, menuItems, mobileMenuItems = [], settings }: SiteHeaderProps) {
   const [offerVisible, setOfferVisible] = useState(true);
@@ -72,8 +109,10 @@ export function SiteHeader({ brandName, logoUrl, categories, menuItems, mobileMe
     return list.length ? list : ["Avail 10% Off, Use Code - LITTLEDIVINITY10 + Get Extra 5% on Prepaid Orders"];
   }, [settings.topbar_offers]);
   const categoryMap = new Map(categories.map((category) => [category.slug, category]));
-  const menuSeed: NavDisplayItem[] = menuItems.length
-    ? menuItems.map((item, index) => ({
+  const normalizedMenuItems = ensureUtilityMenuItems(menuItems);
+  const normalizedMobileMenuItems = ensureUtilityMenuItems(mobileMenuItems.length ? mobileMenuItems : menuItems);
+  const menuSeed: NavDisplayItem[] = normalizedMenuItems.length
+    ? normalizedMenuItems.map((item, index) => ({
         id: item.id || index,
         name: item.title,
         slug: item.url?.includes("?category=") ? item.url.split("?category=")[1] || "" : item.url?.replace(/^\/+/, "") || "",
@@ -105,7 +144,7 @@ export function SiteHeader({ brandName, logoUrl, categories, menuItems, mobileMe
       href: item.href || `/shop?category=${matchedCategory?.slug || item.slug}`
     };
   });
-  const mobileSeed = (mobileMenuItems.length ? mobileMenuItems : menuItems).map((item, index) => ({
+  const mobileSeed = normalizedMobileMenuItems.map((item, index) => ({
     id: item.id || index,
     name: item.title,
     slug: item.url?.includes("?category=") ? item.url.split("?category=")[1] || "" : item.url?.replace(/^\/+/, "") || "",
