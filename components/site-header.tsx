@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { resolveAssetUrl } from "../lib/api";
+import { getAbsoluteMediaUrl } from "../lib/site";
 import { NavigationItem, SiteSettings } from "../lib/types";
 import { useCart } from "./cart-provider";
 import { useWishlist } from "./wishlist-provider";
@@ -180,6 +181,7 @@ export function SiteHeader({ brandName, logoUrl, categories, menuItems, mobileMe
     { href: "/warranty-portal?tab=claim", label: "Service Claim" },
     ...(settings.registry_allow_buyback !== false ? [{ href: "/warranty-portal?tab=buyback", label: "Buyback" }] : [])
   ];
+  const normalizedLogoUrl = getAbsoluteMediaUrl(logoUrl, settings) || resolveAssetUrl(logoUrl || "/logo.jpg");
 
   useEffect(() => {
     if (offers.length <= 1 || !offerVisible) {
@@ -230,7 +232,7 @@ export function SiteHeader({ brandName, logoUrl, categories, menuItems, mobileMe
         <div className="container registry-header-shell">
           <Link href="/" className="registry-brand-mark" aria-label={`${brandName} home`}>
             <Image
-              src={logoUrl ? resolveAssetUrl(logoUrl) : "/logo.jpg"}
+              src={normalizedLogoUrl}
               alt={brandName}
               className="brand-logo"
               width={150}
@@ -287,7 +289,7 @@ export function SiteHeader({ brandName, logoUrl, categories, menuItems, mobileMe
           <div className="brand-lockup">
             <Link href="/" className="brand-mark">
               <Image
-                src={logoUrl ? resolveAssetUrl(logoUrl) : "/logo.jpg"}
+                src={normalizedLogoUrl}
                 alt={brandName}
                 className="brand-logo"
                 width={170}
