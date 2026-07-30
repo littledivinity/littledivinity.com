@@ -240,6 +240,7 @@ h3,
 .brand-lockup {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .brand-mark {
@@ -257,6 +258,14 @@ h3,
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.01em;
+}
+
+.header-nav {
+  justify-content: center;
+}
+
+.header-tools {
+  justify-content: flex-end;
 }
 
 .la-page {
