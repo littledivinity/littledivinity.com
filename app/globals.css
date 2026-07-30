@@ -189,7 +189,7 @@ img {
 
 .header-shell {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr) 152px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 1rem;
   height: 80px;
@@ -241,6 +241,7 @@ h3,
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  justify-self: start;
 }
 
 .brand-mark {
@@ -262,10 +263,12 @@ h3,
 
 .header-nav {
   justify-content: center;
+  justify-self: center;
 }
 
 .header-tools {
   justify-content: flex-end;
+  justify-self: end;
 }
 
 .la-page {
