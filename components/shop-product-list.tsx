@@ -25,34 +25,77 @@ export function ShopProductList({ initialProducts, initialPagination, baseQuery,
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
 
+  const fetchClientProducts = useCallback(async (query: string, page = 1) => {
+    const q = new URLSearchParams(query);
+    if (page > 1) {
+      q.set("page", String(page));
+    }
+    const queryString = q.toString();
+    const url = `https://ecombeckend.saaszo.in/api/v1/catalog/products${queryString ? `?${queryString}` : ""}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Accept: "application/json"
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to load products (${res.status})`);
+    }
+
+    const payload = await res.json();
+    const productItems: Product[] = Array.isArray(payload?.data?.items)
+      ? payload.data.items
+      : Array.isArray(payload?.data)
+      ? payload.data
+      : [];
+
+    const paginationData = payload?.data?.pagination || {
+      current_page: page,
+      per_page: productItems.length,
+      total: productItems.length,
+      last_page: 1
+    };
+
+    return { items: productItems, pagination: paginationData };
+  }, []);
+
   useEffect(() => {
+    let active = true;
+
     if (initialProducts && initialProducts.length > 0) {
       setItems(initialProducts);
       setPagination(initialPagination);
       setError(null);
       loadingRef.current = false;
-    } else {
-      let active = true;
-      setIsLoading(true);
-      getProducts(baseQuery)
-        .then((res) => {
-          if (active && res?.items && res.items.length > 0) {
-            setItems(res.items);
-            setPagination(res.pagination);
-            setError(null);
-          }
-        })
-        .catch((err) => {
-          if (active) setError("Could not load products. Please retry.");
-        })
-        .finally(() => {
-          if (active) setIsLoading(false);
-        });
-      return () => {
-        active = false;
-      };
+      return;
     }
-  }, [baseQuery, initialProducts, initialPagination]);
+
+    setIsLoading(true);
+    setError(null);
+
+    fetchClientProducts(baseQuery, 1)
+      .then((res) => {
+        if (active && res.items) {
+          setItems(res.items);
+          setPagination(res.pagination);
+        }
+      })
+      .catch((err) => {
+        if (active) {
+          setError(err instanceof Error ? err.message : "Could not load products.");
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [baseQuery, initialProducts, initialPagination, fetchClientProducts]);
 
   const hasMore = pagination.current_page < pagination.last_page;
 
@@ -67,13 +110,7 @@ export function ShopProductList({ initialProducts, initialPagination, baseQuery,
     setError(null);
 
     try {
-      const query = new URLSearchParams(baseQuery);
-      query.set("page", String(nextPage));
-      const response = await getProducts(query.toString());
-
-      if (response.pagination.current_page < nextPage || response.pagination.total < items.length) {
-        throw new Error("Could not load more products. Please retry.");
-      }
+      const response = await fetchClientProducts(baseQuery, nextPage);
 
       setItems((currentItems) => {
         const seen = new Set(currentItems.map((product) => getShopProductKey(product)));
@@ -95,7 +132,7 @@ export function ShopProductList({ initialProducts, initialPagination, baseQuery,
       loadingRef.current = false;
       setIsLoading(false);
     }
-  }, [baseQuery, hasMore, items.length, pagination.current_page]);
+  }, [baseQuery, fetchClientProducts, hasMore, pagination.current_page]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
