@@ -279,10 +279,17 @@ function getReadFetchOptions(revalidate = PUBLIC_READ_REVALIDATE_SECONDS): ReadF
 
 async function fetchJson<T>(path: string, options: ReadFetchOptions = { noStore: true }): Promise<T | null> {
   try {
+    const headers: Record<string, string> = {
+      Accept: "application/json"
+    };
+
+    if (typeof window === "undefined") {
+      headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 LittleDivinityStorefront/1.0";
+      headers["Referer"] = "https://www.littledivinity.com";
+    }
+
     const requestOptions: RequestInit & { next?: { revalidate: number } } = {
-      headers: {
-        Accept: "application/json"
-      }
+      headers
     };
 
     if (options.noStore) {
