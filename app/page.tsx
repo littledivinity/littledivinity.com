@@ -465,28 +465,6 @@ export default async function HomePage() {
       </section>
       ) : null}
 
-      {homepageContent.stats.is_active ? (
-      <section className="content-section white-section stats-section mobile-home-hidden">
-        <div className="container">
-          <div className="section-head section-head-center">
-            <div>
-              <p className="eyebrow">{homepageContent.stats.eyebrow}</p>
-              <h2>{homepageContent.stats.title}</h2>
-            </div>
-          </div>
-
-          <div className="stats-grid">
-            {homepageContent.stats.items.map((item) => (
-              <article key={`${item.value}-${item.label}`} className="stat-card">
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-      ) : null}
-
       {homepageContent.festive_edits.is_active ? (
       <section className="content-section mobile-home-hidden">
         <div className="container">
