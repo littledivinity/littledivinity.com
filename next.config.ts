@@ -28,18 +28,6 @@ const nextConfig: NextConfig = {
       }
     ];
   },
-  async rewrites() {
-    return [
-      {
-        source: "/api/v1/:path*",
-        destination: "https://ecombeckend.saaszo.in/api/v1/:path*"
-      },
-      {
-        source: "/storage/:path*",
-        destination: "https://ecombeckend.saaszo.in/storage/:path*"
-      }
-    ];
-  },
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2678400,
