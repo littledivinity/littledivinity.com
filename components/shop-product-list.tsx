@@ -118,6 +118,18 @@ export function ShopProductList({ initialProducts, initialPagination, baseQuery,
     return () => observer.disconnect();
   }, [loadMore]);
 
+  if (isLoading && !items.length) {
+    return (
+      <div className="product-grid shop-product-grid" aria-busy="true">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="product-card" style={{ minHeight: "360px", opacity: 0.6, background: "rgba(255, 255, 255, 0.7)", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <p style={{ color: "var(--muted)" }}>Loading handcrafted brass pieces...</p>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (!items.length) {
     return (
       <div className="shop-empty-state">
