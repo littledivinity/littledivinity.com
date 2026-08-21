@@ -26,7 +26,8 @@ import {
 } from "../../../../lib/api";
 import { getCanonicalUrl, getProductPath, getSiteDescription, getSiteName, getProductRenderKey } from "../../../../lib/site";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type ProductPageProps = {
   params: Promise<{

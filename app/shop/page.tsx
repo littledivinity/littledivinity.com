@@ -10,7 +10,8 @@ import { getCategories, getProducts, getSettings, resolveAssetUrl } from "../../
 import { getCanonicalUrl, getProductPath, getSiteDescription, getSiteName } from "../../lib/site";
 import { referenceAssets } from "../../lib/reference-assets";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type ShopPageProps = {
   searchParams: Promise<{

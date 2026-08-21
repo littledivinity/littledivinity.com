@@ -10,7 +10,8 @@ import { resolveFullHomepageContent } from "../lib/homepage-content";
 import { referenceAssets } from "../lib/reference-assets";
 import { getCanonicalUrl, getProductPath, getProductRenderKey, getSiteDescription, getSiteName } from "../lib/site";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
   const { settings, socialLinks, featuredProducts, newestProducts, homepageSections } = await getHomePageData();
