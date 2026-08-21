@@ -1,8 +1,14 @@
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  process.env.API_BASE_URL ||
-  "https://ecombeckend.saaszo.in/api/v1"
-).trim().replace(/\/+$/, "");
+function normalizeApiBaseUrl(rawUrl?: string | null): string {
+  const fallback = "https://ecombeckend.saaszo.in/api/v1";
+  if (!rawUrl || !rawUrl.trim()) return fallback;
+  let url = rawUrl.trim().replace(/\/+$/, "");
+  if (!url.endsWith("/api/v1")) {
+    url = url.endsWith("/api") ? `${url}/v1` : `${url}/api/v1`;
+  }
+  return url;
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL);
 
 export interface Auction {
   id: number;
