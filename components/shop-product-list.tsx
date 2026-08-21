@@ -26,10 +26,32 @@ export function ShopProductList({ initialProducts, initialPagination, baseQuery,
   const loadingRef = useRef(false);
 
   useEffect(() => {
-    setItems(initialProducts);
-    setPagination(initialPagination);
-    setError(null);
-    loadingRef.current = false;
+    if (initialProducts && initialProducts.length > 0) {
+      setItems(initialProducts);
+      setPagination(initialPagination);
+      setError(null);
+      loadingRef.current = false;
+    } else {
+      let active = true;
+      setIsLoading(true);
+      getProducts(baseQuery)
+        .then((res) => {
+          if (active && res?.items && res.items.length > 0) {
+            setItems(res.items);
+            setPagination(res.pagination);
+            setError(null);
+          }
+        })
+        .catch((err) => {
+          if (active) setError("Could not load products. Please retry.");
+        })
+        .finally(() => {
+          if (active) setIsLoading(false);
+        });
+      return () => {
+        active = false;
+      };
+    }
   }, [baseQuery, initialProducts, initialPagination]);
 
   const hasMore = pagination.current_page < pagination.last_page;

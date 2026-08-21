@@ -531,9 +531,22 @@ export async function getCategories(limit = 8, fetchOptions: ReadFetchOptions = 
 }
 
 export async function getProducts(query = "", fetchOptions: ReadFetchOptions = getReadFetchOptions()): Promise<ProductListResponse> {
-  const payload = await fetchJson<{ data?: ProductListResponse }>(`/catalog/products${query ? `?${query}` : ""}`, fetchOptions);
+  const payload = await fetchJson<any>(`/catalog/products${query ? `?${query}` : ""}`, fetchOptions);
   if (payload?.data) {
-    return payload.data;
+    if (Array.isArray(payload.data.items)) {
+      return payload.data as ProductListResponse;
+    }
+    if (Array.isArray(payload.data)) {
+      return {
+        items: payload.data,
+        pagination: {
+          current_page: 1,
+          per_page: payload.data.length,
+          total: payload.data.length,
+          last_page: 1
+        }
+      };
+    }
   }
 
   if (!STOREFRONT_FALLBACKS_ENABLED) {
