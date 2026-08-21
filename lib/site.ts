@@ -6,10 +6,11 @@ const fallbackSiteUrl = "https://littledivinity.in";
 const fallbackSiteName = "Little Divinity";
 const fallbackSiteDescription =
   "Handcrafted brass decor, pooja accents, and meaningful gifting pieces for home styling and festive gifting.";
-const fallbackBackendSiteUrl =
+const fallbackBackendSiteUrl = (
   process.env.NEXT_PUBLIC_BACKEND_SITE_URL ||
   process.env.BACKEND_SITE_URL ||
-  "https://ecombeckend.saaszo.in";
+  "https://ecombeckend.saaszo.in"
+).trim().replace(/\/+$/, "");
 
 function normalizeUrl(value?: string | null): string {
   const raw =

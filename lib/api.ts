@@ -3,15 +3,17 @@ import { liveContactDefaults, livePrivacyPolicyHtml, liveRefundPolicyHtml, liveT
 import { Category, Coupon, HomepageSection, NavigationItem, Product, ProductListResponse, SiteSettings, SocialLink, BlogPost, BlogCategory, BlogTag, BlogAuthor } from "./types";
 
 
-const API_BASE_URL =
+const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.API_BASE_URL ||
-  "https://ecombeckend.saaszo.in/api/v1";
+  "https://ecombeckend.saaszo.in/api/v1"
+).trim().replace(/\/+$/, "");
 
-const BACKEND_SITE_URL =
+const BACKEND_SITE_URL = (
   process.env.NEXT_PUBLIC_BACKEND_SITE_URL ||
   process.env.BACKEND_SITE_URL ||
-  "https://ecombeckend.saaszo.in";
+  "https://ecombeckend.saaszo.in"
+).trim().replace(/\/+$/, "");
 
 const STOREFRONT_FALLBACKS_ENABLED =
   process.env.NEXT_PUBLIC_ENABLE_STOREFRONT_FALLBACKS === "true" ||
